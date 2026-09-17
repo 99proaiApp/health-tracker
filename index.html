@@ -9,19 +9,19 @@
 </head>
 <body>
     <div class="glass-container">
-        <!-- Header Zone -->
+        <!-- Header -->
         <header class="app-header">
             <h1 class="glow-text">🩺 บันทึกสุขภาพ & การดื่มน้ำ</h1>
             <div id="liveClock" class="clock-badge">กำลังโหลดเวลา...</div>
         </header>
 
-        <!-- Time Selector Zone (บันทึกย้อนหลัง) -->
+        <!-- บล็อกที่ 1: เลือกเวลาที่จะบันทึก (บันทึกย้อนหลัง) -->
         <section class="glass-card time-picker-card">
             <div class="time-picker-header">
-                <span>🕒 เวลาที่จะบันทึก:</span>
+                <span>🕒 เลือกเวลาที่จะบันทึก</span>
                 <label class="switch-label">
                     <input type="checkbox" id="customTimeToggle"> 
-                    <small>กดเพื่อบันทึกย้อนหลัง</small>
+                    <span>บันทึกย้อนหลัง</span>
                 </label>
             </div>
             <div id="customTimeBox" class="custom-time-box hidden">
@@ -29,40 +29,44 @@
             </div>
         </section>
 
-        <!-- Main Tracking Cards -->
+        <!-- บล็อกที่ 2: บันทึกนับปัสสาวะ & ดื่มน้ำ (2 ฝั่งสมดุล) -->
         <section class="tracker-grid">
-            <!-- Urination Card -->
+            <!-- ปัสสาวะ -->
             <div class="glass-card pee-card">
                 <div class="card-icon">🚽</div>
                 <h2>ปัสสาวะ</h2>
                 <div class="counter-display">
                     <span id="peeCount">0</span>
-                    <small>ครั้ง/วันนี้</small>
+                    <small>ครั้ง / วันนี้</small>
                 </div>
                 <div class="button-group">
-                    <button id="addPeeBtn" class="glow-btn btn-pee-add">+ บันทึกฉี่</button>
-                    <button id="subPeeBtn" class="glass-btn btn-sub">- ยกเลิกรายการล่าสุด</button>
+                    <button id="addPeeBtn" class="glow-btn btn-pee">+ บันทึกฉี่</button>
+                    <button id="subPeeBtn" class="glass-btn btn-sub">- ลบรายการล่าสุด</button>
                 </div>
             </div>
 
-            <!-- Water Card -->
+            <!-- ดื่มน้ำ -->
             <div class="glass-card water-card">
                 <div class="card-icon">💧</div>
                 <h2>จิบน้ำ / ดื่มน้ำ</h2>
                 <div class="counter-display">
                     <span id="waterCount">0</span>
-                    <small>ครั้ง/วันนี้</small>
+                    <small>ครั้ง / วันนี้</small>
                 </div>
                 <div class="button-group">
-                    <button id="addWaterBtn" class="glow-btn btn-water-add">+ บันทึกจิบน้ำ</button>
-                    <button id="subWaterBtn" class="glass-btn btn-sub">- ยกเลิกรายการล่าสุด</button>
+                    <button id="addWaterBtn" class="glow-btn btn-water">+ บันทึกจิบน้ำ</button>
+                    <button id="subWaterBtn" class="glass-btn btn-sub">- ลบรายการล่าสุด</button>
                 </div>
             </div>
         </section>
 
-        <!-- Symptom & Event Section -->
+        <!-- บล็อกที่ 3: บันทึกอาการ & เหตุการณ์เฉพาะ (ตามรูปแบบเดิม + ช่องหัวข้อย่อย) -->
         <section class="glass-card symptom-section">
-            <h3>📝 บันทึกอาการ & เหตุการณ์เฉพาะ</h3>
+            <div class="symptom-header">
+                <span class="header-icon">📝</span>
+                <h3>บันทึกอาการ & เหตุการณ์เฉพาะ</h3>
+            </div>
+            
             <div class="symptom-badges">
                 <button class="badge-btn" data-symptom="🥤 กระหายน้ำมาก">🥤 กระหายน้ำมาก</button>
                 <button class="badge-btn" data-symptom="⚠️ ปัสสาวะไม่สุด">⚠️ ปัสสาวะไม่สุด</button>
@@ -71,39 +75,44 @@
                 <button class="badge-btn" data-symptom="☕ ดื่มชา/กาแฟ">☕ ดื่มชา/กาแฟ</button>
             </div>
 
+            <!-- ช่องพิมพ์หัวข้อย่อยเพิ่มเติม (ส่วนที่เพิ่มใหม่) -->
+            <div class="input-group">
+                <input type="text" id="customTopicInput" placeholder="เติมหัวข้อย่อย/สุขภาพ เช่น ยานอนหลับ, ความดัน, ออกกำลังกาย...">
+            </div>
+
+            <!-- ช่องระบุเหตุการณ์เพิ่มเติม (เดิม) -->
             <div class="input-group">
                 <textarea id="eventNote" placeholder="ระบุเหตุการณ์เพิ่มเติม เช่น กินยา, รู้สึกปวดเกร็ง..."></textarea>
             </div>
 
-            <button id="saveNoteBtn" class="glow-btn btn-save-note">💾 บันทึกอาการ / เหตุการณ์</button>
+            <button id="saveNoteBtn" class="glow-btn btn-save">💾 บันทึกอาการ / เหตุการณ์</button>
         </section>
 
-        <!-- Export Data Section -->
+        <!-- บล็อกที่ 4: ปุ่มส่งออกข้อมูล -->
         <section class="export-grid">
             <button id="exportCsvBtn" class="glass-btn btn-export">📊 ส่งออก CSV (Excel)</button>
             <button id="exportPdfBtn" class="glass-btn btn-export btn-pdf">📄 สรุปรายงาน PDF ให้หมอ</button>
         </section>
 
-        <!-- Timeline Log History -->
+        <!-- ประวัติการบันทึก -->
         <section class="glass-card history-section">
-            <h3>📜 ประวัติการบันทึก (เรียงตามเวลา)</h3>
+            <h3>📜 ประวัติการบันทึก</h3>
             <div id="logHistory" class="history-list"></div>
         </section>
     </div>
 
-    <!-- Hidden Template for PDF Export -->
+    <!-- Template สำหรับสร้าง PDF รายงาน -->
     <div id="pdfTemplate" class="pdf-template">
-        <h2>รายงานการบันทึกสุขภาพและการดื่มน้ำ</h2>
-        <p id="pdfDateRange"></p>
-        <hr>
-        <div id="pdfSummary"></div>
-        <h3>รายละเอียดประวัติการบันทึก</h3>
+        <h2 style="text-align: center; color: #1e1b4b; margin-bottom: 5px;">รายงานการบันทึกสุขภาพและการดื่มน้ำ</h2>
+        <p id="pdfDateRange" style="text-align: center; color: #666; font-size: 12px; margin-bottom: 15px;"></p>
         <table>
             <thead>
                 <tr>
-                    <th>วัน-เวลา</th>
-                    <th>รายการ</th>
-                    <th>อาการ / เหตุการณ์เพิ่มเติม</th>
+                    <th style="width: 20%;">วันที่</th>
+                    <th style="width: 15%;">เวลา</th>
+                    <th style="width: 18%;">รายการ</th>
+                    <th style="width: 22%;">หัวข้อย่อย/อาการ</th>
+                    <th style="width: 25%;">เหตุการณ์เพิ่มเติม</th>
                 </tr>
             </thead>
             <tbody id="pdfTableBody"></tbody>
@@ -113,4 +122,3 @@
     <script src="app.js"></script>
 </body>
 </html>
-
