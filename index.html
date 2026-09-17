@@ -15,7 +15,21 @@
             <div id="liveClock" class="clock-badge">กำลังโหลดเวลา...</div>
         </header>
 
-        <!-- Main Tracking Cards (Balanced 2 Columns) -->
+        <!-- Time Selector Zone (บันทึกย้อนหลัง) -->
+        <section class="glass-card time-picker-card">
+            <div class="time-picker-header">
+                <span>🕒 เวลาที่จะบันทึก:</span>
+                <label class="switch-label">
+                    <input type="checkbox" id="customTimeToggle"> 
+                    <small>กดเพื่อบันทึกย้อนหลัง</small>
+                </label>
+            </div>
+            <div id="customTimeBox" class="custom-time-box hidden">
+                <input type="datetime-local" id="customDateTime">
+            </div>
+        </section>
+
+        <!-- Main Tracking Cards -->
         <section class="tracker-grid">
             <!-- Urination Card -->
             <div class="glass-card pee-card">
@@ -27,7 +41,7 @@
                 </div>
                 <div class="button-group">
                     <button id="addPeeBtn" class="glow-btn btn-pee-add">+ บันทึกฉี่</button>
-                    <button id="subPeeBtn" class="glass-btn btn-sub">- ยกเลิก</button>
+                    <button id="subPeeBtn" class="glass-btn btn-sub">- ยกเลิกรายการล่าสุด</button>
                 </div>
             </div>
 
@@ -41,7 +55,7 @@
                 </div>
                 <div class="button-group">
                     <button id="addWaterBtn" class="glow-btn btn-water-add">+ บันทึกจิบน้ำ</button>
-                    <button id="subWaterBtn" class="glass-btn btn-sub">- ยกเลิก</button>
+                    <button id="subWaterBtn" class="glass-btn btn-sub">- ยกเลิกรายการล่าสุด</button>
                 </div>
             </div>
         </section>
@@ -49,8 +63,6 @@
         <!-- Symptom & Event Section -->
         <section class="glass-card symptom-section">
             <h3>📝 บันทึกอาการ & เหตุการณ์เฉพาะ</h3>
-            <p class="subtitle">กดเลือกปุ่มอาการ (กดซ้ำเพื่อยกเลิก) หรือพิมพ์ระบุเพิ่มเติม</p>
-            
             <div class="symptom-badges">
                 <button class="badge-btn" data-symptom="🥤 กระหายน้ำมาก">🥤 กระหายน้ำมาก</button>
                 <button class="badge-btn" data-symptom="⚠️ ปัสสาวะไม่สุด">⚠️ ปัสสาวะไม่สุด</button>
@@ -60,7 +72,7 @@
             </div>
 
             <div class="input-group">
-                <textarea id="eventNote" placeholder="ระบุเหตุการณ์เพิ่มเติม เช่น กินยา, ออกกำลังกาย, รู้สึกปวดเกร็ง..."></textarea>
+                <textarea id="eventNote" placeholder="ระบุเหตุการณ์เพิ่มเติม เช่น กินยา, รู้สึกปวดเกร็ง..."></textarea>
             </div>
 
             <button id="saveNoteBtn" class="glow-btn btn-save-note">💾 บันทึกอาการ / เหตุการณ์</button>
@@ -85,11 +97,11 @@
         <p id="pdfDateRange"></p>
         <hr>
         <div id="pdfSummary"></div>
-        <h3>รายละเอียดประวัติการบันทึกอย่างละเอียด</h3>
+        <h3>รายละเอียดประวัติการบันทึก</h3>
         <table>
             <thead>
                 <tr>
-                    <th>วัน-เวลา (ระดับวินาที)</th>
+                    <th>วัน-เวลา</th>
                     <th>รายการ</th>
                     <th>อาการ / เหตุการณ์เพิ่มเติม</th>
                 </tr>
@@ -101,3 +113,4 @@
     <script src="app.js"></script>
 </body>
 </html>
+
