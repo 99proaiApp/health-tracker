@@ -20,7 +20,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 body {
@@ -66,6 +66,30 @@ body {
     color: #38bdf8;
 }
 
+.sync-badge {
+    display: inline-block;
+    margin-top: 6px;
+    margin-left: 6px;
+    padding: 4px 14px;
+    background: rgba(148, 163, 184, 0.1);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.sync-badge.online {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.3);
+    color: #4ade80;
+}
+
+.sync-badge.error {
+    background: rgba(248, 113, 113, 0.1);
+    border-color: rgba(248, 113, 113, 0.3);
+    color: #f87171;
+}
+
 .glass-card {
     background: var(--card-bg);
     backdrop-filter: blur(16px);
@@ -77,20 +101,34 @@ body {
 }
 
 /* บล็อกย้อนหลัง */
-.time-picker-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.btn-toggle-time {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 12px;
+    color: #38bdf8;
     font-size: 0.88rem;
-    font-weight: 500;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.switch-label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #38bdf8;
-    cursor: pointer;
+.btn-toggle-time:active {
+    transform: scale(0.98);
+}
+
+.btn-toggle-time.active {
+    background: rgba(56, 189, 248, 0.28);
+    border-color: #38bdf8;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.45);
+}
+
+.time-box-label {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
 }
 
 .custom-time-box {
@@ -232,20 +270,29 @@ input[type="datetime-local"] {
 }
 
 .symptom-badges {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
 }
 
+/* ให้ปุ่มสุดท้าย (ตัวที่ 5) กว้างเต็มแถว จัดสมดุล 2+2+1 */
+.symptom-badges .badge-btn:last-child {
+    grid-column: 1 / -1;
+}
+
 .badge-btn {
-    padding: 8px 14px;
+    width: 100%;
+    padding: 10px 10px;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 20px;
+    border-radius: 14px;
     color: var(--text-main);
     font-size: 0.82rem;
+    line-height: 1.3;
     cursor: pointer;
     transition: all 0.2s ease;
+    text-align: center;
+    white-space: normal;
 }
 
 .badge-btn.active {
@@ -364,22 +411,45 @@ textarea:focus {
 .pdf-template {
     display: none;
     padding: 20px;
-    font-family: sans-serif;
+    background: #fff;
+    color: #1e293b;
+    font-family: 'Noto Sans Thai', sans-serif;
 }
 
 .pdf-template table {
     width: 100%;
     border-collapse: collapse;
+    margin-bottom: 6px;
 }
 
 .pdf-template th, .pdf-template td {
     border: 1px solid #cbd5e1;
     padding: 8px;
     font-size: 11px;
+    line-height: 1.5;
     text-align: left;
+    font-family: 'Noto Sans Thai', sans-serif;
 }
 
 .pdf-template th {
     background: #f1f5f9;
     color: #1e293b;
+    font-weight: 600;
+}
+
+.pdf-section-title {
+    margin: 18px 0 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e1b4b;
+    border-bottom: 2px solid #8b5cf6;
+    padding-bottom: 4px;
+}
+
+.pdf-footer-note {
+    margin-top: 16px;
+    font-size: 10px;
+    color: #64748b;
+    line-height: 1.5;
+    font-style: italic;
 }
