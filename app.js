@@ -5,13 +5,15 @@ const liveClock = document.getElementById('liveClock');
 const peeCountEl = document.getElementById('peeCount');
 const waterCountEl = document.getElementById('waterCount');
 const logHistoryEl = document.getElementById('logHistory');
+
+const customTopicInput = document.getElementById('customTopicInput');
 const eventNoteEl = document.getElementById('eventNote');
 
 const customTimeToggle = document.getElementById('customTimeToggle');
 const customTimeBox = document.getElementById('customTimeBox');
 const customDateTimeInput = document.getElementById('customDateTime');
 
-// Live Clock
+// นาฬิกา Real-time แสดงเวลาปัจจุบันพร้อมวินาที
 function updateClock() {
     const now = new Date();
     liveClock.textContent = now.toLocaleString('th-TH', { 
@@ -22,20 +24,19 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// Toggle Custom Time Box
+// เปิด/ปิด ช่องใส่วันและเวลาย้อนหลัง
 customTimeToggle.addEventListener('change', (e) => {
     if (e.target.checked) {
         customTimeBox.classList.remove('hidden');
-        // Set default to current time
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        customDateTimeInput.value = now.toISOString().slice(0,16);
+        customDateTimeInput.value = now.toISOString().slice(0, 16);
     } else {
         customTimeBox.classList.add('hidden');
     }
 });
 
-// Toggle Badges
+// กดปุ่มเลือกอาการ (Toggle Badges - แคปซูล)
 document.querySelectorAll('.badge-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const val = btn.getAttribute('data-symptom');
@@ -49,29 +50,29 @@ document.querySelectorAll('.badge-btn').forEach(btn => {
     });
 });
 
-// Add Log (Support Custom Time)
-function addLog(type, details = '') {
+// ฟังก์ชันบันทึกข้อมูล (รองรับทั้งเวลาปกติและเวลาย้อนหลัง)
+function addLog(type, details = '', customTopic = '') {
     let targetTime = new Date();
     
-    // If user checked custom time
     if (customTimeToggle.checked && customDateTimeInput.value) {
         targetTime = new Date(customDateTimeInput.value);
     }
 
-    const timeStr = targetTime.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.';
     const dateStr = targetTime.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+    const timeStr = targetTime.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' น.';
     
     const newEntry = {
         id: Date.now(),
         timestamp: targetTime.toISOString(),
-        formattedTime: `${dateStr} - ${timeStr}`,
+        dateOnly: dateStr,
+        timeOnly: timeStr,
         type: type,
         symptoms: [...activeSymptoms],
+        topic: customTopic,
         note: details
     };
 
     logs.push(newEntry);
-    // Sort history by time descending
     logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     
     resetForm();
@@ -81,27 +82,31 @@ function addLog(type, details = '') {
 function resetForm() {
     activeSymptoms = [];
     document.querySelectorAll('.badge-btn').forEach(b => b.classList.remove('active'));
+    customTopicInput.value = '';
     eventNoteEl.value = '';
     customTimeToggle.checked = false;
     customTimeBox.classList.add('hidden');
 }
 
+// ลบรายการล่าสุดพร้อมป๊อปอัปยืนยัน
 function subtractLog(type) {
     const lastIndex = logs.findIndex(log => log.type === type);
     if (lastIndex !== -1) {
         const item = logs[lastIndex];
-        if (confirm(`คุณต้องการยกเลิกบันทึก ${type === 'pee' ? 'ปัสสาวะ' : 'ดื่มน้ำ'} ล่าสุดของเวลา [${item.formattedTime}] ใช่หรือไม่?`)) {
+        const typeName = type === 'pee' ? 'ปัสสาวะ' : 'ดื่มน้ำ';
+        if (confirm(`คุณต้องการลบบันทึก ${typeName} ของเวลา [${item.dateOnly} ${item.timeOnly}] ใช่หรือไม่?`)) {
             logs.splice(lastIndex, 1);
             saveAndRender();
         }
     } else {
-        alert('ไม่มีรายการให้ยกเลิกครับ');
+        alert('ไม่มีรายการให้ลบครับ');
     }
 }
 
+// ลบรายการเจาะจง
 function deleteLog(id) {
     const target = logs.find(l => l.id === id);
-    if (target && confirm(`ยืนยันลบรายการเวลา [${target.formattedTime}] นี้ใช่หรือไม่?`)) {
+    if (target && confirm(`ยืนยันลบรายการเวลา [${target.dateOnly} ${target.timeOnly}] นี้ใช่หรือไม่?`)) {
         logs = logs.filter(l => l.id !== id);
         saveAndRender();
     }
@@ -127,15 +132,21 @@ function renderHistory() {
         const item = document.createElement('div');
         item.className = `history-item ${log.type}`;
         
-        let title = log.type === 'pee' ? '🚽 บันทึกปัสสาวะ' : (log.type === 'water' ? '💧 บันทึกดื่มน้ำ/จิบน้ำ' : '📝 บันทึกอาการ');
-        let extra = [...log.symptoms, log.note].filter(Boolean).join(' | ');
+        let title = log.type === 'pee' ? '🚽 บันทึกปัสสาวะ' : (log.type === 'water' ? '💧 บันทึกดื่มน้ำ' : '📝 บันทึกอาการ');
+        
+        let detailsArr = [];
+        if (log.topic) detailsArr.push(`📌 หัวข้อ: ${log.topic}`);
+        if (log.symptoms.length > 0) detailsArr.push(`อาการ: ${log.symptoms.join(', ')}`);
+        if (log.note) detailsArr.push(`เหตุการณ์: ${log.note}`);
+        
+        let extraStr = detailsArr.join(' | ');
 
         item.innerHTML = `
             <div class="history-info">
                 <strong>${title}</strong>
-                <small>⏱️ ${log.formattedTime} ${extra ? `<br>💬 ${extra}` : ''}</small>
+                <small>⏱️ ${log.dateOnly} - ${log.timeOnly} ${extraStr ? `<br>${extraStr}` : ''}</small>
             </div>
-            <button class="delete-item-btn" onclick="deleteLog(${log.id})">🗑️</button>
+            <button class="delete-btn" onclick="deleteLog(${log.id})">🗑️</button>
         `;
         logHistoryEl.appendChild(item);
     });
@@ -147,21 +158,27 @@ document.getElementById('subPeeBtn').addEventListener('click', () => subtractLog
 document.getElementById('subWaterBtn').addEventListener('click', () => subtractLog('water'));
 
 document.getElementById('saveNoteBtn').addEventListener('click', () => {
+    const topicText = customTopicInput.value.trim();
     const noteText = eventNoteEl.value.trim();
-    if (activeSymptoms.length === 0 && !noteText) {
-        alert('กรุณากดเลือกอาการหรือพิมพ์ข้อความก่อนบันทึกครับ');
+    
+    if (activeSymptoms.length === 0 && !topicText && !noteText) {
+        alert('กรุณาเลือกอาการ พิมพ์หัวข้อย่อย หรือพิมพ์เหตุการณ์ก่อนกดบันทึกครับ');
         return;
     }
-    addLog('note', noteText);
+    addLog('note', noteText, topicText);
 });
 
-// CSV Export
+// ส่งออก CSV (แยกวันที่ เวลา หัวข้อ/อาการ และเหตุการณ์ ชัดเจน)
 document.getElementById('exportCsvBtn').addEventListener('click', () => {
-    let csv = "data:text/csv;charset=utf-8,\uFEFFวัน-เวลา,รายการ,อาการ/เหตุการณ์\n";
+    let csv = "data:text/csv;charset=utf-8,\uFEFFวันที่,เวลา,รายการ,หัวข้อย่อย/อาการ,เหตุการณ์เพิ่มเติม\n";
     logs.forEach(l => {
         let typeStr = l.type === 'pee' ? 'ปัสสาวะ' : (l.type === 'water' ? 'ดื่มน้ำ' : 'บันทึกอาการ');
-        let extra = [...l.symptoms, l.note].filter(Boolean).join(' ');
-        csv += `"${l.formattedTime}","${typeStr}","${extra}"\n`;
+        
+        let symStr = [];
+        if (l.topic) symStr.push(`[${l.topic}]`);
+        if (l.symptoms.length > 0) symStr.push(l.symptoms.join(' '));
+        
+        csv += `"${l.dateOnly}","${l.timeOnly}","${typeStr}","${symStr.join(' ')}","${l.note || ''}"\n`;
     });
     const link = document.createElement('a');
     link.href = encodeURI(csv);
@@ -169,18 +186,29 @@ document.getElementById('exportCsvBtn').addEventListener('click', () => {
     link.click();
 });
 
-// PDF Export
+// ส่งออก PDF (แยกคอลัมน์ระดับนาที/วินาที ชัดเจน)
 document.getElementById('exportPdfBtn').addEventListener('click', () => {
     const template = document.getElementById('pdfTemplate');
     const tbody = document.getElementById('pdfTableBody');
     
-    document.getElementById('pdfDateRange').textContent = `รายงานข้อมูล ณ วันที่: ${new Date().toLocaleDateString('th-TH')}`;
+    document.getElementById('pdfDateRange').textContent = `ข้อมูล ณ วันที่: ${new Date().toLocaleDateString('th-TH')}`;
     tbody.innerHTML = '';
     
     logs.forEach(l => {
         let typeStr = l.type === 'pee' ? 'ปัสสาวะ' : (l.type === 'water' ? 'ดื่มน้ำ' : 'บันทึกอาการ');
-        let extra = [...l.symptoms, l.note].filter(Boolean).join(' | ');
-        tbody.innerHTML += `<tr><td>${l.formattedTime}</td><td>${typeStr}</td><td>${extra || '-'}</td></tr>`;
+        
+        let symStr = [];
+        if (l.topic) symStr.push(`📌 ${l.topic}`);
+        if (l.symptoms.length > 0) symStr.push(l.symptoms.join(', '));
+
+        tbody.innerHTML += `
+            <tr>
+                <td>${l.dateOnly}</td>
+                <td>${l.timeOnly}</td>
+                <td>${typeStr}</td>
+                <td>${symStr.join('<br>') || '-'}</td>
+                <td>${l.note || '-'}</td>
+            </tr>`;
     });
 
     template.style.display = 'block';
