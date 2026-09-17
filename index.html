@@ -3,80 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>บันทึกการปัสสาวะและสุขภาพ (Urination & Health Log)</title>
+    <title>Health & Water Tracker</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🩺 บันทึกสุขภาพ & การปัสสาวะ</h1>
-            <p>ติดตามพฤติกรรมเพื่อนำข้อมูลให้แพทย์วิเคราะห์</p>
+    <div class="glass-container">
+        <!-- Header Zone -->
+        <header class="app-header">
+            <h1 class="glow-text">🩺 บันทึกสุขภาพ & การดื่มน้ำ</h1>
+            <div id="liveClock" class="clock-badge">กำลังโหลดเวลา...</div>
         </header>
 
-        <section class="summary-cards">
-            <div class="card bg-blue">
-                <h3>วันนี้ฉี่ไปแล้ว</h3>
-                <div class="number" id="todayPeeCount">0</div>
-                <small>ครั้ง</small>
+        <!-- Main Tracking Cards (Balanced 2 Columns) -->
+        <section class="tracker-grid">
+            <!-- Urination Card -->
+            <div class="glass-card pee-card">
+                <div class="card-icon">🚽</div>
+                <h2>ปัสสาวะ</h2>
+                <div class="counter-display">
+                    <span id="peeCount">0</span>
+                    <small>ครั้ง/วันนี้</small>
+                </div>
+                <div class="button-group">
+                    <button id="addPeeBtn" class="glow-btn btn-pee-add">+ บันทึกฉี่</button>
+                    <button id="subPeeBtn" class="glass-btn btn-sub">- ยกเลิก</button>
+                </div>
             </div>
-            <div class="card bg-teal">
-                <h3>วันนี้ดื่มน้ำไป</h3>
-                <div class="number" id="todayWaterAmount">0</div>
-                <small>มิลลิลิตร (ml)</small>
+
+            <!-- Water Card -->
+            <div class="glass-card water-card">
+                <div class="card-icon">💧</div>
+                <h2>จิบน้ำ / ดื่มน้ำ</h2>
+                <div class="counter-display">
+                    <span id="waterCount">0</span>
+                    <small>ครั้ง/วันนี้</small>
+                </div>
+                <div class="button-group">
+                    <button id="addWaterBtn" class="glow-btn btn-water-add">+ บันทึกจิบน้ำ</button>
+                    <button id="subWaterBtn" class="glass-btn btn-sub">- ยกเลิก</button>
+                </div>
             </div>
         </section>
 
-        <section class="action-buttons">
-            <button id="peeBtn" class="btn btn-pee">
-                <span class="icon">🚽</span>
-                <span>กดบันทึกปัสสาวะ</span>
-            </button>
-            <div class="water-input-group">
-                <button id="waterBtn" class="btn btn-water">
-                    <span class="icon">💧</span>
-                    <span>+ บันทึกน้ำดื่ม</span>
-                </button>
-                <input type="number" id="waterAmount" value="250" step="50" min="50" placeholder="ml">
-                <span class="unit">ml</span>
+        <!-- Symptom & Event Section -->
+        <section class="glass-card symptom-section">
+            <h3>📝 บันทึกอาการ & เหตุการณ์เฉพาะ</h3>
+            <p class="subtitle">กดเลือกปุ่มอาการ (กดซ้ำเพื่อยกเลิก) หรือพิมพ์ระบุเพิ่มเติม</p>
+            
+            <div class="symptom-badges">
+                <button class="badge-btn" data-symptom="🥤 กระหายน้ำมาก">🥤 กระหายน้ำมาก</button>
+                <button class="badge-btn" data-symptom="⚠️ ปัสสาวะไม่สุด">⚠️ ปัสสาวะไม่สุด</button>
+                <button class="badge-btn" data-symptom="⚡ แสบ/ขัด">⚡ แสบ/ขัด</button>
+                <button class="badge-btn" data-symptom="🌙 ตื่นฉี่กลางคืน">🌙 ตื่นฉี่กลางคืน</button>
+                <button class="badge-btn" data-symptom="☕ ดื่มชา/กาแฟ">☕ ดื่มชา/กาแฟ</button>
             </div>
-        </section>
 
-        <section class="symptoms-section">
-            <h3>📝 บันทึกอาการเพิ่มเติม (ถ้ามี)</h3>
-            <div class="tags">
-                <label class="tag"><input type="checkbox" value="กระหายน้ำมาก" class="symptom-check"> 🥤 กระหายน้ำมาก</label>
-                <label class="tag"><input type="checkbox" value="ปัสสาวะไม่สุด" class="symptom-check"> ⚠️ ปัสสาวะไม่สุด</label>
-                <label class="tag"><input type="checkbox" value="แสบ/ขัด" class="symptom-check"> ⚡ แสบ/ขัด</label>
-                <label class="tag"><input type="checkbox" value="ตื่นมาฉี่กลางคืน" class="symptom-check"> 🌙 ตื่นฉี่กลางคืน</label>
+            <div class="input-group">
+                <textarea id="eventNote" placeholder="ระบุเหตุการณ์เพิ่มเติม เช่น กินยา, ออกกำลังกาย, รู้สึกปวดเกร็ง..."></textarea>
             </div>
-            <textarea id="noteInput" placeholder="บันทึกเพิ่มเติม เช่น อาการอื่นๆ หรืออาหารที่กิน..."></textarea>
+
+            <button id="saveNoteBtn" class="glow-btn btn-save-note">💾 บันทึกอาการ / เหตุการณ์</button>
         </section>
 
-        <section class="export-section">
-            <button id="exportCsvBtn" class="btn-sub">📊 ส่งออก CSV (Excel)</button>
-            <button id="exportPdfBtn" class="btn-sub btn-pdf">📄 สรุปรายงาน PDF ให้หมอ</button>
+        <!-- Export Data Section -->
+        <section class="export-grid">
+            <button id="exportCsvBtn" class="glass-btn btn-export">📊 ส่งออก CSV (Excel)</button>
+            <button id="exportPdfBtn" class="glass-btn btn-export btn-pdf">📄 สรุปรายงาน PDF ให้หมอ</button>
         </section>
 
-        <section class="history-section">
-            <h3>📜 ประวัติการบันทึก</h3>
-            <ul id="logList" class="log-list"></ul>
+        <!-- Timeline Log History -->
+        <section class="glass-card history-section">
+            <h3>📜 ประวัติการบันทึก (เรียงตามเวลา)</h3>
+            <div id="logHistory" class="history-list"></div>
         </section>
     </div>
 
+    <!-- Hidden Template for PDF Export -->
     <div id="pdfTemplate" class="pdf-template">
-        <h2>รายงานการบันทึกการปัสสาวะและน้ำดื่ม</h2>
-        <p id="pdfDateRange">ข้อมูล ณ วันที่: -</p>
+        <h2>รายงานการบันทึกสุขภาพและการดื่มน้ำ</h2>
+        <p id="pdfDateRange"></p>
         <hr>
         <div id="pdfSummary"></div>
-        <h3>รายละเอียดประวัติ</h3>
-        <table id="pdfTable">
+        <h3>รายละเอียดประวัติการบันทึกอย่างละเอียด</h3>
+        <table>
             <thead>
                 <tr>
-                    <th>วัน-เวลา</th>
-                    <th>ประเภท</th>
-                    <th>รายละเอียด/ปริมาณ</th>
-                    <th>อาการ/บันทึกเพิ่มเติม</th>
+                    <th>วัน-เวลา (ระดับวินาที)</th>
+                    <th>รายการ</th>
+                    <th>อาการ / เหตุการณ์เพิ่มเติม</th>
                 </tr>
             </thead>
             <tbody id="pdfTableBody"></tbody>
@@ -86,4 +101,3 @@
     <script src="app.js"></script>
 </body>
 </html>
-
