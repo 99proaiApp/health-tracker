@@ -1,14 +1,17 @@
 let logs = JSON.parse(localStorage.getItem('glass_health_logs')) || [];
 let activeSymptoms = [];
 
-// Elements
 const liveClock = document.getElementById('liveClock');
 const peeCountEl = document.getElementById('peeCount');
 const waterCountEl = document.getElementById('waterCount');
 const logHistoryEl = document.getElementById('logHistory');
 const eventNoteEl = document.getElementById('eventNote');
 
-// Real-time Clock Update
+const customTimeToggle = document.getElementById('customTimeToggle');
+const customTimeBox = document.getElementById('customTimeBox');
+const customDateTimeInput = document.getElementById('customDateTime');
+
+// Live Clock
 function updateClock() {
     const now = new Date();
     liveClock.textContent = now.toLocaleString('th-TH', { 
@@ -19,7 +22,20 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// Toggle Symptom Badges
+// Toggle Custom Time Box
+customTimeToggle.addEventListener('change', (e) => {
+    if (e.target.checked) {
+        customTimeBox.classList.remove('hidden');
+        // Set default to current time
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        customDateTimeInput.value = now.toISOString().slice(0,16);
+    } else {
+        customTimeBox.classList.add('hidden');
+    }
+});
+
+// Toggle Badges
 document.querySelectorAll('.badge-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const val = btn.getAttribute('data-symptom');
@@ -33,22 +49,31 @@ document.querySelectorAll('.badge-btn').forEach(btn => {
     });
 });
 
-// Add Logs
+// Add Log (Support Custom Time)
 function addLog(type, details = '') {
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' น.';
-    const dateStr = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+    let targetTime = new Date();
+    
+    // If user checked custom time
+    if (customTimeToggle.checked && customDateTimeInput.value) {
+        targetTime = new Date(customDateTimeInput.value);
+    }
+
+    const timeStr = targetTime.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.';
+    const dateStr = targetTime.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
     
     const newEntry = {
         id: Date.now(),
-        timestamp: now.toISOString(),
+        timestamp: targetTime.toISOString(),
         formattedTime: `${dateStr} - ${timeStr}`,
         type: type,
         symptoms: [...activeSymptoms],
         note: details
     };
 
-    logs.unshift(newEntry);
+    logs.push(newEntry);
+    // Sort history by time descending
+    logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
     resetForm();
     saveAndRender();
 }
@@ -57,9 +82,10 @@ function resetForm() {
     activeSymptoms = [];
     document.querySelectorAll('.badge-btn').forEach(b => b.classList.remove('active'));
     eventNoteEl.value = '';
+    customTimeToggle.checked = false;
+    customTimeBox.classList.add('hidden');
 }
 
-// Subtract/Cancel Last Entry with Confirmation
 function subtractLog(type) {
     const lastIndex = logs.findIndex(log => log.type === type);
     if (lastIndex !== -1) {
@@ -73,7 +99,6 @@ function subtractLog(type) {
     }
 }
 
-// Delete Specific Log Item with Confirmation
 function deleteLog(id) {
     const target = logs.find(l => l.id === id);
     if (target && confirm(`ยืนยันลบรายการเวลา [${target.formattedTime}] นี้ใช่หรือไม่?`)) {
@@ -82,7 +107,6 @@ function deleteLog(id) {
     }
 }
 
-// Save & Update UI
 function saveAndRender() {
     localStorage.setItem('glass_health_logs', JSON.stringify(logs));
     updateCounters();
@@ -117,7 +141,6 @@ function renderHistory() {
     });
 }
 
-// Event Listeners
 document.getElementById('addPeeBtn').addEventListener('click', () => addLog('pee'));
 document.getElementById('addWaterBtn').addEventListener('click', () => addLog('water'));
 document.getElementById('subPeeBtn').addEventListener('click', () => subtractLog('pee'));
@@ -150,7 +173,6 @@ document.getElementById('exportCsvBtn').addEventListener('click', () => {
 document.getElementById('exportPdfBtn').addEventListener('click', () => {
     const template = document.getElementById('pdfTemplate');
     const tbody = document.getElementById('pdfTableBody');
-    const summary = document.getElementById('pdfSummary');
     
     document.getElementById('pdfDateRange').textContent = `รายงานข้อมูล ณ วันที่: ${new Date().toLocaleDateString('th-TH')}`;
     tbody.innerHTML = '';
