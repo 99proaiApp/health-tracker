@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บันทึกสุขภาพประจำวัน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Serif+Thai:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F6F4EE;
+    --paper: #FFFFFF;
+    --ink: #2B2A26;
+    --ink-soft: #6B6A63;
+    --line: #E4E0D4;
+    --moss: #5C7A5A;
+    --moss-deep: #3F5A3E;
+    --clay: #C97A4A;
+    --clay-soft: #F3E3D6;
+    --alert: #B8563F;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Noto Sans Thai', sans-serif;
+    line-height: 1.6;
+    padding: 28px 16px 80px;
+  }
+  .wrap{ max-width: 560px; margin: 0 auto; }
+
+  header{ margin-bottom: 22px; }
+  header h1{
+    font-family: 'Noto Serif Thai', serif;
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin: 0 0 4px;
+  }
+  header p{ margin:0; color: var(--ink-soft); font-size: 0.92rem; }
+  header .date{ color: var(--moss-deep); font-weight: 500; }
+
+  .card{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card h2{
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 14px;
+    color: var(--moss-deep);
+  }
+
+  /* counter card */
+  .counter-row{ display:flex; align-items:center; gap: 18px; }
+  .count-big{
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--moss-deep);
+    min-width: 64px;
+  }
+  .count-label{ color: var(--ink-soft); font-size: 0.85rem; }
+  .btn-log{
+    margin-top: 14px;
+    width: 100%;
+    padding: 18px;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--moss);
+    color: #fff;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s ease, transform .05s ease;
+  }
+  .btn-log:active{ transform: scale(0.98); }
+  .btn-log:hover{ background: var(--moss-deep); }
+
+  /* water card */
+  .water-row{ display:flex; gap:10px; flex-wrap: wrap; }
+  .btn-chip{
+    flex: 1 1 auto;
+    min-width: 84px;
+    padding: 12px 10px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #FBFAF6;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .btn-chip:hover{ border-color: var(--moss); background: var(--clay-soft); }
+  .water-total{
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+  .water-total b{ color: var(--moss-deep); font-size: 1.1rem; }
+  .custom-row{ display:flex; gap:8px; margin-top: 10px; }
+  .custom-row input{
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+  .custom-row button{
+    padding: 10px 16px;
+    border: none;
+    border-radius: 10px;
+    background: var(--clay);
+    color: #fff;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* symptom card */
+  .field{ margin-bottom: 14px; }
+  .field:last-child{ margin-bottom: 0; }
+  .field label{ display:block; font-size: 0.88rem; color: var(--ink-soft); margin-bottom: 6px; }
+  .toggle-group{ display:flex; gap: 8px; flex-wrap: wrap; }
+  .toggle{
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: #FBFAF6;
+    font-family: inherit;
+    font-size: 0.86rem;
+    cursor: pointer;
+  }
+  .toggle.on{ background: var(--moss); border-color: var(--moss); color: #fff; }
+  select, input[type=number]{
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    background: #FBFAF6;
+  }
+  .btn-save-symptom{
+    margin-top: 16px;
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    background: var(--clay);
+    color: #fff;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+  .btn-save-symptom:hover{ background: #a9663b; }
+
+  /* log list */
+  .log-item{
+    display:flex; justify-content: space-between; align-items: flex-start;
+    padding: 10px 0; border-bottom: 1px solid var(--line);
+    font-size: 0.88rem;
+  }
+  .log-item:last-child{ border-bottom: none; }
+  .log-time{ color: var(--ink-soft); white-space: nowrap; margin-right: 12px; }
+  .log-desc{ flex: 1; }
+  .log-desc .tag{
+    display:inline-block; background: var(--clay-soft); color: var(--moss-deep);
+    padding: 2px 8px; border-radius: 20px; font-size: 0.76rem; margin: 2px 4px 0 0;
+  }
+  .log-del{
+    background:none; border:none; color: var(--ink-soft); cursor:pointer; font-size: 0.8rem;
+    padding: 2px 4px;
+  }
+  .log-del:hover{ color: var(--alert); }
+  .empty{ color: var(--ink-soft); font-size: 0.86rem; padding: 6px 0; }
+
+  /* export */
+  .export-row{ display:flex; gap:10px; }
+  .btn-export{
+    flex:1;
+    padding: 13px;
+    border: 1px solid var(--moss-deep);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--moss-deep);
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  .btn-export:hover{ background: var(--moss-deep); color: #fff; }
+
+  footer{
+    text-align:center; color: var(--ink-soft); font-size: 0.78rem; margin-top: 24px;
+  }
+
+  @media print{
+    body{ padding: 0; background:#fff; }
+    .no-print{ display:none !important; }
+    .card{ border: none; border-bottom: 1px solid #ccc; border-radius:0; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>บันทึกสุขภาพประจำวัน</h1>
+    <p class="date" id="todayLabel"></p>
+    <p>กดปุ่มเดียวเพื่อบันทึกครั้ง ระบบจดวันที่-เวลาให้อัตโนมัติ ข้อมูลเก็บไว้ในเครื่องนี้เท่านั้น</p>
+  </header>
+
+  <div class="card">
+    <h2>ตัวนับวันนี้</h2>
+    <div class="counter-row">
+      <div>
+        <div class="count-big" id="countToday">0</div>
+        <div class="count-label">ครั้งวันนี้</div>
+      </div>
+    </div>
+    <button class="btn-log" id="btnLog">＋ บันทึกครั้งนี้</button>
+  </div>
+
+  <div class="card">
+    <h2>น้ำที่ดื่ม</h2>
+    <div class="water-row">
+      <button class="btn-chip" data-ml="250">+250 มล.</button>
+      <button class="btn-chip" data-ml="500">+500 มล.</button>
+      <button class="btn-chip" data-ml="1000">+1 ลิตร</button>
+    </div>
+    <div class="custom-row">
+      <input type="number" id="customMl" placeholder="ปริมาณอื่นๆ (มล.)">
+      <button id="btnCustomMl">เพิ่ม</button>
+    </div>
+    <div class="water-total">วันนี้ดื่มไปแล้ว <b id="waterToday">0</b> มล.</div>
+  </div>
+
+  <div class="card">
+    <h2>อาการเสริม (ถ้ามี)</h2>
+    <div class="field">
+      <label>อาการที่สังเกตวันนี้</label>
+      <div class="toggle-group" id="symptomToggles">
+        <button class="toggle" data-sym="กระหายน้ำมาก">กระหายน้ำมาก</button>
+        <button class="toggle" data-sym="อ่อนเพลีย">อ่อนเพลีย</button>
+        <button class="toggle" data-sym="หิวบ่อย">หิวบ่อย</button>
+        <button class="toggle" data-sym="ตาพร่า">ตาพร่า</button>
+        <button class="toggle" data-sym="มือ/เท้าชา">มือ/เท้าชา</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>ปัสสาวะกลางคืน (จำนวนครั้ง)</label>
+      <input type="number" id="nightPee" min="0" placeholder="เช่น 2">
+    </div>
+    <div class="field">
+      <label>สีปัสสาวะ</label>
+      <select id="peeColor">
+        <option value="">ไม่ระบุ</option>
+        <option>ใสมาก</option>
+        <option>เหลืองอ่อน</option>
+        <option>เหลืองเข้ม</option>
+        <option>ส้ม/น้ำตาล</option>
+      </select>
+    </div>
+    <button class="btn-save-symptom" id="btnSaveSymptom">บันทึกอาการวันนี้</button>
+  </div>
+
+  <div class="card">
+    <h2>ประวัติย้อนหลัง</h2>
+    <div id="logList"></div>
+  </div>
+
+  <div class="card no-print">
+    <h2>ส่งออกข้อมูล</h2>
+    <div class="export-row">
+      <button class="btn-export" id="btnExportCsv">Export CSV</button>
+      <button class="btn-export" id="btnExportPdf">Export PDF (พิมพ์)</button>
+    </div>
+  </div>
+
+  <footer>ข้อมูลทั้งหมดเก็บอยู่ในเบราว์เซอร์นี้เท่านั้น ไม่มีการส่งขึ้นเซิร์ฟเวอร์ใดๆ</footer>
+</div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'health_tracker_entries_v1';
+  const todayStr = () => new Date().toISOString().slice(0,10);
+  const nowTime = () => new Date().toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
+
+  const thaiDateFmt = new Intl.DateTimeFormat('th-TH', { year:'numeric', month:'long', day:'numeric', weekday:'long' });
+  document.getElementById('todayLabel').textContent = thaiDateFmt.format(new Date());
+
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function save(entries){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }
+    catch(e){ console.error('save failed', e); }
+  }
+
+  let entries = load();
+
+  function todaysEntries(){
+    const t = todayStr();
+    return entries.filter(e => e.date === t);
+  }
+
+  function render(){
+    const today = todaysEntries();
+    document.getElementById('countToday').textContent = today.filter(e=>e.type==='count').length;
+    const waterMl = today.filter(e=>e.type==='water').reduce((s,e)=>s+e.amount,0);
+    document.getElementById('waterToday').textContent = waterMl;
+
+    const list = document.getElementById('logList');
+    if(entries.length === 0){
+      list.innerHTML = '<div class="empty">ยังไม่มีบันทึก เริ่มกดปุ่มด้านบนได้เลย</div>';
+      return;
+    }
+    const sorted = [...entries].sort((a,b)=> (b.date+b.time).localeCompare(a.date+a.time));
+    list.innerHTML = sorted.slice(0,60).map(e=>{
+      let desc = '';
+      if(e.type === 'count') desc = 'บันทึกครั้ง';
+      else if(e.type === 'water') desc = `ดื่มน้ำ ${e.amount} มล.`;
+      else if(e.type === 'symptom'){
+        const tags = (e.symptoms||[]).map(s=>`<span class="tag">${s}</span>`).join('');
+        const extra = [];
+        if(e.nightPee) extra.push(`ปัสสาวะกลางคืน ${e.nightPee} ครั้ง`);
+        if(e.peeColor) extra.push(`สีปัสสาวะ: ${e.peeColor}`);
+        desc = `อาการ ${tags} ${extra.join(' · ')}`;
+      }
+      return `<div class="log-item">
+        <span class="log-time">${e.date} ${e.time}</span>
+        <span class="log-desc">${desc}</span>
+        <button class="log-del" data-id="${e.id}">ลบ</button>
+      </div>`;
+    }).join('');
+
+    list.querySelectorAll('.log-del').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        entries = entries.filter(e=>e.id !== btn.dataset.id);
+        save(entries);
+        render();
+      });
+    });
+  }
+
+  function addEntry(entry){
+    entry.id = Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+    entry.date = todayStr();
+    entry.time = nowTime();
+    entries.push(entry);
+    save(entries);
+    render();
+  }
+
+  document.getElementById('btnLog').addEventListener('click', ()=>{
+    addEntry({ type: 'count' });
+  });
+
+  document.querySelectorAll('.btn-chip').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      addEntry({ type: 'water', amount: parseInt(btn.dataset.ml, 10) });
+    });
+  });
+
+  document.getElementById('btnCustomMl').addEventListener('click', ()=>{
+    const input = document.getElementById('customMl');
+    const val = parseInt(input.value, 10);
+    if(val && val > 0){
+      addEntry({ type: 'water', amount: val });
+      input.value = '';
+    }
+  });
+
+  const activeSymptoms = new Set();
+  document.querySelectorAll('#symptomToggles .toggle').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const s = btn.dataset.sym;
+      if(activeSymptoms.has(s)){ activeSymptoms.delete(s); btn.classList.remove('on'); }
+      else{ activeSymptoms.add(s); btn.classList.add('on'); }
+    });
+  });
+
+  document.getElementById('btnSaveSymptom').addEventListener('click', ()=>{
+    const nightPee = document.getElementById('nightPee').value;
+    const peeColor = document.getElementById('peeColor').value;
+    if(activeSymptoms.size === 0 && !nightPee && !peeColor){
+      return; // nothing to save
+    }
+    addEntry({
+      type: 'symptom',
+      symptoms: Array.from(activeSymptoms),
+      nightPee: nightPee ? parseInt(nightPee,10) : null,
+      peeColor: peeColor || null
+    });
+    activeSymptoms.clear();
+    document.querySelectorAll('#symptomToggles .toggle').forEach(b=>b.classList.remove('on'));
+    document.getElementById('nightPee').value = '';
+    document.getElementById('peeColor').value = '';
+  });
+
+  document.getElementById('btnExportCsv').addEventListener('click', ()=>{
+    const rows = [['วันที่','เวลา','ประเภท','รายละเอียด']];
+    [...entries].sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).forEach(e=>{
+      let detail = '';
+      if(e.type==='count') detail = 'บันทึกครั้ง';
+      else if(e.type==='water') detail = `น้ำ ${e.amount} มล.`;
+      else if(e.type==='symptom'){
+        const parts = [];
+        if(e.symptoms && e.symptoms.length) parts.push(e.symptoms.join('/'));
+        if(e.nightPee) parts.push(`ปัสสาวะกลางคืน ${e.nightPee} ครั้ง`);
+        if(e.peeColor) parts.push(`สีปัสสาวะ ${e.peeColor}`);
+        detail = parts.join(' | ');
+      }
+      rows.push([e.date, e.time, e.type, detail]);
+    });
+    const csv = '\uFEFF' + rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `health-log-${todayStr()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('btnExportPdf').addEventListener('click', ()=>{
+    window.print();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
