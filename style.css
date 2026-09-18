@@ -409,7 +409,10 @@ textarea:focus {
 
 /* PDF Template styling */
 .pdf-template {
-    display: none;
+    position: fixed;
+    top: 0;
+    left: -9999px;
+    width: 760px;
     padding: 20px;
     background: #fff;
     color: #1e293b;
