@@ -327,19 +327,17 @@ document.getElementById('exportPdfBtn').addEventListener('click', async () => {
             </tr>`;
     }).join('') || '<tr><td colspan="5" style="text-align:center;">ยังไม่มีข้อมูล</td></tr>';
 
-    template.style.display = 'block';
-
-    // รอให้ฟอนต์ไทยโหลดเสร็จก่อน ป้องกันปัญหาตัวอักษรอ่านไม่ออกใน PDF
+    // รอให้ฟอนต์ไทยโหลดเสร็จและเลย์เอาต์นิ่งก่อนถ่ายภาพ (การ์ดนี้อยู่นอกจอตลอดเวลาอยู่แล้ว ไม่ต้องสลับ display)
     if (document.fonts && document.fonts.ready) {
         await document.fonts.ready;
     }
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
     html2pdf().set({
         margin: 10,
         filename: `รายงานสุขภาพ_${new Date().toISOString().slice(0,10)}.pdf`,
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { scale: 2, useCORS: true, windowWidth: 760 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    }).from(template).save().then(() => {
-        template.style.display = 'none';
-    });
+    }).from(template).save();
 });
+
